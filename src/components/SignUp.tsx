@@ -24,7 +24,12 @@ const SignUp: React.FC<SignUpProps> = ({
     <Header as="h2">SignUp</Header>
     <Form loading={isLoading} error={error ? true : false} widths="equal">
       <Form.Input fluid label="Email address" onChange={onEmailTextChanged} />
-      <Form.Input fluid label="Password" onChange={onPasswordTextChanged} />
+      <Form.Input
+        type="password"
+        fluid
+        label="Password"
+        onChange={onPasswordTextChanged}
+      />
       {error && <Message error header="Error" content={error} />}
       <Button disabled={!canSignUp} onClick={onButtonClicked}>
         SignUp
