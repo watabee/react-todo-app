@@ -85,7 +85,6 @@ export const reducer: Reducer<SignUpState, SignUpAction> = (
 
 function* signUp(action: ReturnType<typeof signUpActions.signUpStart>) {
   const { history, firebase, email, password } = action.payload.params;
-  console.log(`signUp start: email=${email}, password=${password}`);
   try {
     const credencial = yield call(firebase.signUp, email, password);
 
