@@ -3,9 +3,9 @@ import Firebase from "../../firebase";
 import { call, put, takeLatest } from "redux-saga/effects";
 import { History } from "history";
 
-const LOGIN_START = "todoApp/signUp/LOGIN_START";
-const LOGIN_SUCCEED = "todoApp/signUp/LOGIN_SUCCEED";
-const LOGIN_FAIL = "todoApp/signUp/LOGIN_FAIL";
+const LOGIN_START = "todoApp/login/LOGIN_START";
+const LOGIN_SUCCEED = "todoApp/login/LOGIN_SUCCEED";
+const LOGIN_FAIL = "todoApp/login/LOGIN_FAIL";
 
 interface LoginParams {
   history: History;
