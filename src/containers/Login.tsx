@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Firebase, { FirebaseContext } from "../firebase";
 
 import Login, { LoginProps } from "../components/Login";
@@ -21,6 +21,8 @@ interface DispatchProps {
     email: string,
     password: string
   ) => void;
+
+  resetError: () => void;
 }
 
 type EnhancedSignUpProps = LoginProps &
@@ -32,6 +34,7 @@ const LoginContainer: React.FC<EnhancedSignUpProps> = ({
   isLoading,
   error,
   loginStart,
+  resetError,
   history
 }) => {
   const [email, setEmail] = useState("");
@@ -47,6 +50,10 @@ const LoginContainer: React.FC<EnhancedSignUpProps> = ({
   const onButtonClicked = () => {
     loginStart(history, firebase, email, password);
   };
+
+  useEffect(() => {
+    return () => resetError();
+  }, []);
 
   return (
     <Login
@@ -73,7 +80,9 @@ const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
         firebase: Firebase,
         email: string,
         password: string
-      ) => loginActions.loginStart({ history, firebase, email, password })
+      ) => loginActions.loginStart({ history, firebase, email, password }),
+
+      resetError: () => loginActions.resetError()
     },
     dispatch
   );

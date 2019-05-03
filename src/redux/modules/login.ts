@@ -6,6 +6,7 @@ import { History } from "history";
 const LOGIN_START = "todoApp/login/LOGIN_START";
 const LOGIN_SUCCEED = "todoApp/login/LOGIN_SUCCEED";
 const LOGIN_FAIL = "todoApp/login/LOGIN_FAIL";
+const RESET_ERROR = "todoApp/login/RESET_ERROR";
 
 interface LoginParams {
   history: History;
@@ -33,13 +34,18 @@ export const loginActions = {
     type: LOGIN_FAIL as typeof LOGIN_FAIL,
     payload: { error },
     error: true
+  }),
+
+  resetError: () => ({
+    type: RESET_ERROR as typeof RESET_ERROR
   })
 };
 
 export type LoginAction =
   | ReturnType<typeof loginActions.loginStart>
   | ReturnType<typeof loginActions.loginSucceed>
-  | ReturnType<typeof loginActions.loginFail>;
+  | ReturnType<typeof loginActions.loginFail>
+  | ReturnType<typeof loginActions.resetError>;
 
 export interface LoginState {
   credencial?: firebase.auth.UserCredential;
@@ -76,6 +82,12 @@ export const reducer: Reducer<LoginState, LoginAction> = (
         ...state,
         isLoading: false,
         error: action.payload.error
+      };
+
+    case RESET_ERROR:
+      return {
+        ...state,
+        error: undefined
       };
 
     default:
