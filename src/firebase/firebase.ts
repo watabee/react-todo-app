@@ -59,9 +59,34 @@ class Firebase {
         .collection("users")
         .doc(firebase.auth().currentUser!!.uid)
         .collection("todos")
-        .add({ todo });
+        .add(todo);
 
       return docRef;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  getTodos = async (filterdStatus: TodoStatus) => {
+    try {
+      const querySnapshot = await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser!!.uid)
+        .collection("todos")
+        .where("status", "==", filterdStatus)
+        .where("deleted", "==", false)
+        .get();
+
+      const todos: Todo[] = [];
+      console.log(
+        `${filterdStatus} # querySnapshot size = ${querySnapshot.size}`
+      );
+      if (!querySnapshot.empty) {
+        querySnapshot.forEach(doc => todos.push(doc.data() as Todo));
+      }
+
+      return todos;
     } catch (error) {
       throw error;
     }
