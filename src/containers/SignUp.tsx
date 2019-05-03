@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Firebase, { FirebaseContext } from "../firebase";
 
 import SignUp, { SignUpProps } from "../components/SignUp";
@@ -21,6 +21,8 @@ interface DispatchProps {
     email: string,
     password: string
   ) => void;
+
+  resetError: () => void;
 }
 
 type EnhancedSignUpProps = SignUpProps &
@@ -32,6 +34,7 @@ const SignUpContainer: React.FC<EnhancedSignUpProps> = ({
   isLoading,
   error,
   signUpStart,
+  resetError,
   history
 }) => {
   const [email, setEmail] = useState("");
@@ -47,6 +50,10 @@ const SignUpContainer: React.FC<EnhancedSignUpProps> = ({
   const onButtonClicked = () => {
     signUpStart(history, firebase, email, password);
   };
+
+  useEffect(() => {
+    return () => resetError();
+  }, []);
 
   return (
     <SignUp
@@ -73,7 +80,9 @@ const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
         firebase: Firebase,
         email: string,
         password: string
-      ) => signUpActions.signUpStart({ history, firebase, email, password })
+      ) => signUpActions.signUpStart({ history, firebase, email, password }),
+
+      resetError: () => signUpActions.resetError()
     },
     dispatch
   );

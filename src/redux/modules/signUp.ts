@@ -6,6 +6,7 @@ import { History } from "history";
 const SIGN_UP_START = "todoApp/signUp/SIGN_UP_START";
 const SIGN_UP_SUCCEED = "todoApp/signUp/SIGN_UP_SUCCEED";
 const SIGN_UP_FAIL = "todoApp/signUp/SIGN_UP_FAIL";
+const RESET_ERROR = "todoApp/signUp/RESET_ERROR";
 
 interface SignUpParams {
   history: History;
@@ -33,13 +34,18 @@ export const signUpActions = {
     type: SIGN_UP_FAIL as typeof SIGN_UP_FAIL,
     payload: { error },
     error: true
+  }),
+
+  resetError: () => ({
+    type: RESET_ERROR as typeof RESET_ERROR
   })
 };
 
 export type SignUpAction =
   | ReturnType<typeof signUpActions.signUpStart>
   | ReturnType<typeof signUpActions.signUpSucceed>
-  | ReturnType<typeof signUpActions.signUpFail>;
+  | ReturnType<typeof signUpActions.signUpFail>
+  | ReturnType<typeof signUpActions.resetError>;
 
 export interface SignUpState {
   credencial?: firebase.auth.UserCredential;
@@ -76,6 +82,12 @@ export const reducer: Reducer<SignUpState, SignUpAction> = (
         ...state,
         isLoading: false,
         error: action.payload.error
+      };
+
+    case RESET_ERROR:
+      return {
+        ...state,
+        error: undefined
       };
 
     default:
