@@ -1,5 +1,8 @@
+import { Todo } from "./../models/todo";
 import * as firebase from "firebase/app";
+import { TodoStatus } from "../models/todo";
 require("firebase/auth"); // https://stackoverflow.com/questions/48592656/firebase-auth-is-not-a-function
+require("firebase/firestore");
 
 export const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -40,6 +43,29 @@ class Firebase {
   };
 
   isLoggedIn = (): boolean => firebase.auth().currentUser !== null;
+
+  addTodo = async (title: string, note: string) => {
+    try {
+      const todo: Todo = {
+        title,
+        note,
+        created_at: firebase.firestore.Timestamp.now(),
+        deleted: false,
+        status: TodoStatus.Todo
+      };
+
+      const docRef = await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser!!.uid)
+        .collection("todos")
+        .add({ todo });
+
+      return docRef;
+    } catch (error) {
+      throw error;
+    }
+  };
 }
 
 export default Firebase;

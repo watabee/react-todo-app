@@ -3,7 +3,7 @@ import { Switch, Route, Redirect } from "react-router";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./containers/Home";
-import Todos from "./components/Todos";
+import Todos from "./containers/Todos";
 import SignUp from "./containers/SignUp";
 import Login from "./containers/Login";
 
