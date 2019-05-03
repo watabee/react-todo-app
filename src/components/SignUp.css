@@ -1,0 +1,15 @@
+.ui.grid {
+    height: 100vh;
+}
+
+.field label {
+    text-align: left;
+}
+
+.ui.error.message {
+    text-align: left;
+}
+
+.ui.button {
+    margin-top: 32px
+}
