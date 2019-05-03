@@ -2,7 +2,7 @@ import { firestore } from "firebase/app";
 import { Reducer } from "redux";
 import Firebase from "../../firebase";
 import { put, call, takeLatest, all } from "redux-saga/effects";
-import { Todo, TodoStatus } from "../../models/todo";
+import { TodoStatus, TodoEntity } from "../../models/todo";
 
 const GET_TODOS_START = "todoApp/todos/GET_TODOS_START";
 const GET_TODOS_SUCCEED = "todoApp/todos/GET_TODOS_SUCCEED";
@@ -16,9 +16,9 @@ interface GetTodosParams {
 }
 
 interface GetTodosResult {
-  todoTodos: Todo[];
-  inProgressTodos: Todo[];
-  doneTodos: Todo[];
+  todoTodos: TodoEntity[];
+  inProgressTodos: TodoEntity[];
+  doneTodos: TodoEntity[];
 }
 
 interface AddTodoParams {
@@ -76,9 +76,9 @@ type TodosAction =
 export interface TodosState {
   isGettingTodos: boolean;
   isAddingTodo: boolean;
-  todoTodos: Todo[];
-  inProgressTodos: Todo[];
-  doneTodos: Todo[];
+  todoTodos: TodoEntity[];
+  inProgressTodos: TodoEntity[];
+  doneTodos: TodoEntity[];
   error?: firestore.FirestoreError;
 }
 

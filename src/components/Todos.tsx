@@ -1,12 +1,12 @@
 import React from "react";
 import { Header, Button } from "semantic-ui-react";
-import { Todo } from "../models/todo";
+import { TodoEntity } from "../models/todo";
 import { firestore } from "firebase/app";
 
 export interface TodosProps {
-  todoTodos: Todo[];
-  inProgressTodos: Todo[];
-  doneTodos: Todo[];
+  todoTodos: TodoEntity[];
+  inProgressTodos: TodoEntity[];
+  doneTodos: TodoEntity[];
   isGettingTodos: boolean;
   isAddingTodo: boolean;
   error?: firestore.FirestoreError;

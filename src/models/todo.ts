@@ -13,3 +13,7 @@ export interface Todo {
   status: TodoStatus;
   created_at: firestore.Timestamp;
 }
+
+export interface TodoEntity extends Todo {
+  id: string;
+}

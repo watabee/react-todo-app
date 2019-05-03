@@ -1,4 +1,4 @@
-import { Todo } from "./../models/todo";
+import { Todo, TodoEntity } from "./../models/todo";
 import * as firebase from "firebase/app";
 import { TodoStatus } from "../models/todo";
 require("firebase/auth"); // https://stackoverflow.com/questions/48592656/firebase-auth-is-not-a-function
@@ -78,12 +78,14 @@ class Firebase {
         .where("deleted", "==", false)
         .get();
 
-      const todos: Todo[] = [];
+      const todos: TodoEntity[] = [];
       console.log(
         `${filterdStatus} # querySnapshot size = ${querySnapshot.size}`
       );
       if (!querySnapshot.empty) {
-        querySnapshot.forEach(doc => todos.push(doc.data() as Todo));
+        querySnapshot.forEach(doc =>
+          todos.push({ id: doc.id, ...(doc.data() as Todo) })
+        );
       }
 
       return todos;

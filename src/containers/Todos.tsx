@@ -3,16 +3,16 @@ import Firebase, { FirebaseContext } from "../firebase";
 
 import TodosComponent, { TodosProps } from "../components/Todos";
 import { firestore } from "firebase/app";
-import { TodosState, todosActions } from "../redux/modules/todos";
+import { todosActions } from "../redux/modules/todos";
 import { Dispatch, bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { Todo } from "../models/todo";
+import { TodoEntity } from "../models/todo";
 import { AppState } from "../redux/state";
 
 interface StateProps {
-  todoTodos: Todo[];
-  inProgressTodos: Todo[];
-  doneTodos: Todo[];
+  todoTodos: TodoEntity[];
+  inProgressTodos: TodoEntity[];
+  doneTodos: TodoEntity[];
   isGettingTodos: boolean;
   isAddingTodo: boolean;
   error?: firestore.FirestoreError;
