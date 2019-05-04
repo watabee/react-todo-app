@@ -52,7 +52,7 @@ const TodosContainer: React.FC<EnhancedTodosProps> = ({
   const firebase = useContext(FirebaseContext) as Firebase;
 
   const onFormSubmitted = () => {
-    if (inputText.length > 0) {
+    if (inputText.trim().length > 0) {
       addTodo(firebase, inputText);
     }
   };
