@@ -30,6 +30,7 @@ interface DispatchProps {
     todo: TodoEntity,
     newStatus: TodoStatus
   ) => void;
+  updateTodoToDelete: (firebase: Firebase, todo: TodoEntity) => void;
   updateInputText: (text: string) => void;
 }
 
@@ -43,6 +44,7 @@ const TodosContainer: React.FC<EnhancedTodosProps> = ({
   isAddingTodo,
   error,
   updateTodoStatus,
+  updateTodoToDelete,
   addTodo,
   updateTodosStart,
   updateTodosSucceed,
@@ -82,6 +84,7 @@ const TodosContainer: React.FC<EnhancedTodosProps> = ({
       }}
       onInputTextChanged={updateInputText}
       onFormSubmitted={onFormSubmitted}
+      onDeleteButtonClicked={todo => updateTodoToDelete(firebase, todo)}
     />
   );
 };
@@ -113,6 +116,9 @@ const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
         todo: TodoEntity,
         newStatus: TodoStatus
       ) => todosActions.updateTodoStatusStart({ firebase, todo, newStatus }),
+
+      updateTodoToDelete: (firebase: Firebase, todo: TodoEntity) =>
+        todosActions.updateTodoToDeleteStart({ firebase, todo }),
 
       updateInputText: (text: string) => todosActions.updateInputText({ text })
     },

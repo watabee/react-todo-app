@@ -87,6 +87,27 @@ class Firebase {
     }
   };
 
+  updateTodoToDelete = async (entity: TodoEntity) => {
+    if (entity.deleted) {
+      return;
+    }
+
+    const { id, ...todo } = entity;
+    const newTodo: Todo = { ...todo, deleted: true };
+
+    try {
+      await firebase
+        .firestore()
+        .collection("users")
+        .doc(firebase.auth().currentUser!!.uid)
+        .collection("todos")
+        .doc(id)
+        .update(newTodo);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   observeTodos = (
     onUpdate: (todoTodos: TodoEntity[], doneTodos: TodoEntity[]) => void,
     onError: (error: Error) => void

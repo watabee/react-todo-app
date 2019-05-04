@@ -1,6 +1,16 @@
 import React from "react";
 import Helmet from "react-helmet";
-import { Header, Card, Checkbox, Loader, Form } from "semantic-ui-react";
+import {
+  Header,
+  List,
+  Card,
+  Checkbox,
+  Loader,
+  Form,
+  Button,
+  Segment,
+  Icon
+} from "semantic-ui-react";
 import { TodoEntity, TodoStatus } from "../models/todo";
 
 import "./Todos.css";
@@ -15,6 +25,7 @@ export interface TodosProps {
   onCheckboxClicked?: (todo: TodoEntity) => void;
   onInputTextChanged?: (text: string) => void;
   onFormSubmitted?: () => void;
+  onDeleteButtonClicked?: (todo: TodoEntity) => void;
 }
 
 const TodosComponent: React.FC<TodosProps> = ({
@@ -26,29 +37,37 @@ const TodosComponent: React.FC<TodosProps> = ({
   error = undefined,
   onCheckboxClicked = () => {},
   onInputTextChanged = () => {},
-  onFormSubmitted = () => {}
+  onFormSubmitted = () => {},
+  onDeleteButtonClicked = () => {}
 }) => {
   const mapTodoToCardComponent = (todo: TodoEntity) => {
     const done = todo.status === TodoStatus.Done;
     const checkboxStyle = done ? { textDecoration: "line-through" } : {};
-    const cardStyle = done ? { opacity: 0.8 } : {};
+    const contentStyle = done ? { opacity: 0.7 } : {};
 
     return (
-      <Card key={todo.id} style={cardStyle}>
-        <Card.Content>
+      <List.Item key={todo.id}>
+        <List.Content className="custom segment" style={contentStyle}>
           <Checkbox
             label={todo.title}
             style={checkboxStyle}
             defaultChecked={todo.status === TodoStatus.Done}
             onChange={() => onCheckboxClicked(todo)}
           />
-        </Card.Content>
-      </Card>
+          <Button
+            icon="trash"
+            circular
+            basic
+            style={{ marginTop: 0 }}
+            onClick={() => onDeleteButtonClicked(todo)}
+          />
+        </List.Content>
+      </List.Item>
     );
   };
 
   const mapTodosToComponent = (todos: TodoEntity[]) => (
-    <Card.Group itemsPerRow={1}>{todos.map(mapTodoToCardComponent)}</Card.Group>
+    <List>{todos.map(mapTodoToCardComponent)}</List>
   );
 
   return (

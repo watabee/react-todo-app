@@ -13,6 +13,9 @@ const UPDATE_TODO_STATUS_FAIL = "todoApp/todos/UPDATE_TODO_STATUS_FAIL";
 const ADD_TODO_START = "todoApp/todos/ADD_TODO_START";
 const ADD_TODO_SUCCEED = "todoApp/todos/ADD_TODO_SUCCEED";
 const ADD_TODO_FAIL = "todoApp/todos/ADD_TODO_FAIL";
+const UPDATE_TODO_TO_DELETE_START = "todoApp/todos/DELETE_TODO_START";
+const UPDATE_TODO_TO_DELETE_SUCCEED = "todoApp/todos/DELETE_TODO_SUCCEED";
+const UPDATE_TODO_TO_DELETE_FAIL = "todoApp/todos/DELETE_TODO_FAIL";
 const UPDATE_INPUT_TEXT = "todoApp/todos/UPDATE_INPUT_TEXT";
 
 interface UpdateTodosResult {
@@ -29,6 +32,11 @@ interface UpdateTodoStatusParams {
 interface AddTodoParams {
   firebase: Firebase;
   title: string;
+}
+
+interface UpdateTodoToDeleteParams {
+  firebase: Firebase;
+  todo: TodoEntity;
 }
 
 interface UpdateInputTextParams {
@@ -79,6 +87,21 @@ export const todosActions = {
     error: true
   }),
 
+  updateTodoToDeleteStart: (params: UpdateTodoToDeleteParams) => ({
+    type: UPDATE_TODO_TO_DELETE_START as typeof UPDATE_TODO_TO_DELETE_START,
+    payload: { params }
+  }),
+
+  updateTodoToDeleteSucceed: () => ({
+    type: UPDATE_TODO_TO_DELETE_SUCCEED as typeof UPDATE_TODO_TO_DELETE_SUCCEED
+  }),
+
+  updateTodoToDeleteFail: (error: Error) => ({
+    type: UPDATE_TODO_TO_DELETE_FAIL as typeof UPDATE_TODO_TO_DELETE_FAIL,
+    payload: { error },
+    error: true
+  }),
+
   updateInputText: (params: UpdateInputTextParams) => ({
     type: UPDATE_INPUT_TEXT as typeof UPDATE_INPUT_TEXT,
     payload: { params }
@@ -95,6 +118,9 @@ type TodosAction =
   | ReturnType<typeof todosActions.addTodoStart>
   | ReturnType<typeof todosActions.addTodoSucceed>
   | ReturnType<typeof todosActions.addTodoFail>
+  | ReturnType<typeof todosActions.updateTodoToDeleteStart>
+  | ReturnType<typeof todosActions.updateTodoToDeleteSucceed>
+  | ReturnType<typeof todosActions.updateTodoToDeleteFail>
   | ReturnType<typeof todosActions.updateInputText>;
 
 export interface TodosState {
@@ -180,6 +206,23 @@ export const reducer: Reducer<TodosState, TodosAction> = (
         error: action.payload.error
       };
 
+    case UPDATE_TODO_TO_DELETE_START:
+      return {
+        ...state,
+        error: undefined
+      };
+
+    case UPDATE_TODO_TO_DELETE_SUCCEED:
+      return {
+        ...state
+      };
+
+    case UPDATE_TODO_TO_DELETE_FAIL:
+      return {
+        ...state,
+        error: action.payload.error
+      };
+
     case UPDATE_INPUT_TEXT:
       return {
         ...state,
@@ -217,7 +260,21 @@ function* addTodo(action: ReturnType<typeof todosActions.addTodoStart>) {
   }
 }
 
+function* updateTodoToDelete(
+  action: ReturnType<typeof todosActions.updateTodoToDeleteStart>
+) {
+  try {
+    const { firebase, todo } = action.payload.params;
+
+    yield call(firebase.updateTodoToDelete, todo);
+    yield put(todosActions.updateTodoToDeleteSucceed());
+  } catch (error) {
+    yield put(todosActions.updateTodoToDeleteFail(error));
+  }
+}
+
 export function* rootSaga() {
   yield takeLatest(ADD_TODO_START, addTodo);
+  yield takeLatest(UPDATE_TODO_TO_DELETE_START, updateTodoToDelete);
   yield takeLatest(UPDATE_TODO_STATUS_START, updateTodoStatus);
 }
