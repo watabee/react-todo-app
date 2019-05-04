@@ -1,70 +1,96 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import Firebase, { FirebaseContext } from "../firebase";
 
 import TodosComponent, { TodosProps } from "../components/Todos";
-import { firestore } from "firebase/app";
 import { todosActions } from "../redux/modules/todos";
 import { Dispatch, bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { TodoEntity } from "../models/todo";
+import { TodoEntity, TodoStatus } from "../models/todo";
 import { AppState } from "../redux/state";
 
 interface StateProps {
   todoTodos: TodoEntity[];
-  inProgressTodos: TodoEntity[];
   doneTodos: TodoEntity[];
-  isGettingTodos: boolean;
+  isLoading: boolean;
   isAddingTodo: boolean;
-  error?: firestore.FirestoreError;
+  inputText: string;
+  error?: Error;
 }
 
 interface DispatchProps {
-  getTodos: (firebase: Firebase) => void;
-  addTodo: (firebase: Firebase, title: string, note: string) => void;
+  addTodo: (firebase: Firebase, title: string) => void;
+  updateTodosStart: () => void;
+  updateTodosSucceed: (
+    todoTodos: TodoEntity[],
+    doneTodos: TodoEntity[]
+  ) => void;
+  updateTodosFail: (error: Error) => void;
+  updateTodoStatus: (
+    firebase: Firebase,
+    todo: TodoEntity,
+    newStatus: TodoStatus
+  ) => void;
+  updateInputText: (text: string) => void;
 }
 
 type EnhancedTodosProps = TodosProps & StateProps & DispatchProps;
 
 const TodosContainer: React.FC<EnhancedTodosProps> = ({
   todoTodos,
-  inProgressTodos,
   doneTodos,
-  isGettingTodos,
+  inputText,
+  isLoading,
   isAddingTodo,
   error,
-  getTodos,
-  addTodo
+  updateTodoStatus,
+  addTodo,
+  updateTodosStart,
+  updateTodosSucceed,
+  updateTodosFail,
+  updateInputText
 }) => {
   const firebase = useContext(FirebaseContext) as Firebase;
-  const [count, setCount] = useState(1);
 
-  const onAddTodoButtonClicked = () => {
-    addTodo(firebase, `タイトル${count}`, "NOTE");
-    setCount(prevCount => prevCount + 1);
+  const onFormSubmitted = () => {
+    if (inputText.length > 0) {
+      addTodo(firebase, inputText);
+    }
   };
 
   useEffect(() => {
-    getTodos(firebase);
+    updateTodosStart();
+    const unsubscribe = firebase.observeTodos(
+      updateTodosSucceed,
+      updateTodosFail
+    );
+
+    return () => unsubscribe();
   }, []);
 
   return (
     <TodosComponent
       todoTodos={todoTodos}
-      inProgressTodos={inProgressTodos}
       doneTodos={doneTodos}
-      isGettingTodos={isGettingTodos}
+      inputText={inputText}
+      isLoading={isLoading}
       isAddingTodo={isAddingTodo}
       error={error}
-      onAddTodoButtonClicked={onAddTodoButtonClicked}
+      onCheckboxClicked={(todo: TodoEntity) => {
+        const newStatus: TodoStatus =
+          todo.status === TodoStatus.Todo ? TodoStatus.Done : TodoStatus.Todo;
+        updateTodoStatus(firebase, todo, newStatus);
+      }}
+      onInputTextChanged={updateInputText}
+      onFormSubmitted={onFormSubmitted}
     />
   );
 };
 
 const mapStateToProps = (state: AppState): StateProps => ({
   todoTodos: state.todos.todoTodos,
-  inProgressTodos: state.todos.inProgressTodos,
   doneTodos: state.todos.doneTodos,
-  isGettingTodos: state.todos.isGettingTodos,
+  inputText: state.todos.inputText,
+  isLoading: state.todos.isLoading,
   isAddingTodo: state.todos.isAddingTodo,
   error: state.todos.error
 });
@@ -72,10 +98,23 @@ const mapStateToProps = (state: AppState): StateProps => ({
 const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
   bindActionCreators(
     {
-      getTodos: (firebase: Firebase) =>
-        todosActions.getTodosStart({ firebase }),
-      addTodo: (firebase: Firebase, title: string, note: string) =>
-        todosActions.addTodoStart({ firebase, title, note })
+      addTodo: (firebase: Firebase, title: string) =>
+        todosActions.addTodoStart({ firebase, title }),
+
+      updateTodosStart: () => todosActions.updateTodosStart(),
+
+      updateTodosSucceed: (todoTodos: TodoEntity[], doneTodos: TodoEntity[]) =>
+        todosActions.updateTodosSucceed({ todoTodos, doneTodos }),
+
+      updateTodosFail: (error: Error) => todosActions.updateTodosFail(error),
+
+      updateTodoStatus: (
+        firebase: Firebase,
+        todo: TodoEntity,
+        newStatus: TodoStatus
+      ) => todosActions.updateTodoStatusStart({ firebase, todo, newStatus }),
+
+      updateInputText: (text: string) => todosActions.updateInputText({ text })
     },
     dispatch
   );

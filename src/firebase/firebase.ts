@@ -44,11 +44,10 @@ class Firebase {
 
   isLoggedIn = (): boolean => firebase.auth().currentUser !== null;
 
-  addTodo = async (title: string, note: string) => {
+  addTodo = async (title: string) => {
     try {
       const todo: Todo = {
         title,
-        note,
         created_at: firebase.firestore.Timestamp.now(),
         deleted: false,
         status: TodoStatus.Todo
@@ -67,31 +66,57 @@ class Firebase {
     }
   };
 
-  getTodos = async (filterdStatus: TodoStatus) => {
+  updateTodoStatus = async (entity: TodoEntity, newStatus: TodoStatus) => {
+    if (entity.status === newStatus) {
+      return;
+    }
+
+    const { id, ...todo } = entity;
+    const newTodo: Todo = { ...todo, status: newStatus };
+
     try {
-      const querySnapshot = await firebase
+      await firebase
         .firestore()
         .collection("users")
         .doc(firebase.auth().currentUser!!.uid)
         .collection("todos")
-        .where("status", "==", filterdStatus)
-        .where("deleted", "==", false)
-        .get();
-
-      const todos: TodoEntity[] = [];
-      console.log(
-        `${filterdStatus} # querySnapshot size = ${querySnapshot.size}`
-      );
-      if (!querySnapshot.empty) {
-        querySnapshot.forEach(doc =>
-          todos.push({ id: doc.id, ...(doc.data() as Todo) })
-        );
-      }
-
-      return todos;
+        .doc(id)
+        .update(newTodo);
     } catch (error) {
       throw error;
     }
+  };
+
+  observeTodos = (
+    onUpdate: (todoTodos: TodoEntity[], doneTodos: TodoEntity[]) => void,
+    onError: (error: Error) => void
+  ): (() => void) => {
+    return firebase
+      .firestore()
+      .collection("users")
+      .doc(firebase.auth().currentUser!!.uid)
+      .collection("todos")
+      .where("deleted", "==", false)
+      .onSnapshot(snapshot => {
+        const todoTodos: TodoEntity[] = [];
+        const doneTodos: TodoEntity[] = [];
+        if (!snapshot.empty) {
+          snapshot.forEach(doc => {
+            const entity: TodoEntity = { id: doc.id, ...(doc.data() as Todo) };
+            switch (entity.status) {
+              case TodoStatus.Todo:
+                todoTodos.push(entity);
+                break;
+              case TodoStatus.Done:
+                doneTodos.push(entity);
+                break;
+              default:
+                throw Error("Illegal state");
+            }
+          });
+        }
+        onUpdate(todoTodos, doneTodos);
+      }, onError);
   };
 }
 
