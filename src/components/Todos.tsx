@@ -1,4 +1,5 @@
 import React from "react";
+import Helmet from "react-helmet";
 import { Header, Card, Checkbox, Loader, Form } from "semantic-ui-react";
 import { TodoEntity, TodoStatus } from "../models/todo";
 
@@ -51,35 +52,40 @@ const TodosComponent: React.FC<TodosProps> = ({
   );
 
   return (
-    <div className="todo-list">
-      {isLoading ? (
-        <Loader active>Loading</Loader>
-      ) : (
-        <>
-          <Form onSubmit={onFormSubmitted} loading={isAddingTodo}>
-            <Form.Input
-              placeholder="Add a to-do..."
-              value={inputText}
-              onChange={(e, { value }) => onInputTextChanged(value)}
-            />
-          </Form>
+    <>
+      <Helmet>
+        <title>Todo List | Todo</title>
+      </Helmet>
+      <div className="todo-list">
+        {isLoading ? (
+          <Loader active>Loading</Loader>
+        ) : (
+          <>
+            <Form onSubmit={onFormSubmitted} loading={isAddingTodo}>
+              <Form.Input
+                placeholder="Add a to-do..."
+                value={inputText}
+                onChange={(e, { value }) => onInputTextChanged(value)}
+              />
+            </Form>
 
-          {todoTodos.length > 0 && (
-            <Header as="h2" block>
-              {todoTodos.length} TO-DO
-            </Header>
-          )}
-          {mapTodosToComponent(todoTodos)}
+            {todoTodos.length > 0 && (
+              <Header as="h2" block>
+                {todoTodos.length} TO-DO
+              </Header>
+            )}
+            {mapTodosToComponent(todoTodos)}
 
-          {doneTodos.length > 0 && (
-            <Header as="h2" block>
-              {doneTodos.length} COMPLETED TO-DO
-            </Header>
-          )}
-          {mapTodosToComponent(doneTodos)}
-        </>
-      )}
-    </div>
+            {doneTodos.length > 0 && (
+              <Header as="h2" block>
+                {doneTodos.length} COMPLETED TO-DO
+              </Header>
+            )}
+            {mapTodosToComponent(doneTodos)}
+          </>
+        )}
+      </div>
+    </>
   );
 };
 

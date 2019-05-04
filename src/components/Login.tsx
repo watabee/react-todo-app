@@ -1,4 +1,5 @@
 import React from "react";
+import Helmet from "react-helmet";
 import {
   Form,
   Button,
@@ -26,48 +27,57 @@ const Login: React.FC<LoginProps> = ({
   onPasswordTextChanged = () => {},
   onButtonClicked = () => {}
 }) => (
-  <div className="login-form">
-    <Grid textAlign="center" style={{ height: "100vh" }} verticalAlign="middle">
-      <Grid.Column style={{ maxWidth: 450 }}>
-        <Header as="h2" textAlign="center" color="teal">
-          Log in to Todo App
-        </Header>
+  <>
+    <Helmet>
+      <title>Login | Todo</title>
+    </Helmet>
+    <div className="login-form">
+      <Grid
+        textAlign="center"
+        style={{ height: "100vh" }}
+        verticalAlign="middle"
+      >
+        <Grid.Column style={{ maxWidth: 450 }}>
+          <Header as="h2" textAlign="center" color="teal">
+            Log in to Todo
+          </Header>
 
-        <Form loading={isLoading} error={error ? true : false} size="large">
-          <Segment stacked>
-            <Form.Input
-              fluid
-              icon="user"
-              iconPosition="left"
-              placeholder="E-mail address"
-              onChange={onEmailTextChanged}
-            />
-            <Form.Input
-              type="password"
-              fluid
-              icon="lock"
-              iconPosition="left"
-              placeholder="Password"
-              onChange={onPasswordTextChanged}
-            />
-            {error && <Message error header="Error" content={error} />}
-            <Button
-              fluid
-              color="teal"
-              size="large"
-              disabled={!canLogin}
-              onClick={onButtonClicked}
-            >
-              Login
-            </Button>
-          </Segment>
-        </Form>
-        <Message>
-          New to us? <Link to="/signup">Create an account</Link>.
-        </Message>
-      </Grid.Column>
-    </Grid>
-  </div>
+          <Form loading={isLoading} error={error ? true : false} size="large">
+            <Segment stacked>
+              <Form.Input
+                fluid
+                icon="user"
+                iconPosition="left"
+                placeholder="E-mail address"
+                onChange={onEmailTextChanged}
+              />
+              <Form.Input
+                type="password"
+                fluid
+                icon="lock"
+                iconPosition="left"
+                placeholder="Password"
+                onChange={onPasswordTextChanged}
+              />
+              {error && <Message error header="Error" content={error} />}
+              <Button
+                fluid
+                color="teal"
+                size="large"
+                disabled={!canLogin}
+                onClick={onButtonClicked}
+              >
+                Login
+              </Button>
+            </Segment>
+          </Form>
+          <Message>
+            New to us? <Link to="/signup">Create an account</Link>.
+          </Message>
+        </Grid.Column>
+      </Grid>
+    </div>
+  </>
 );
 
 export default Login;
