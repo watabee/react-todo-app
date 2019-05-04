@@ -1,4 +1,3 @@
-import { firestore } from "firebase/app";
 import { Reducer } from "redux";
 import Firebase from "../../firebase";
 import { put, call, takeLatest } from "redux-saga/effects";
@@ -81,7 +80,7 @@ export const todosActions = {
     type: ADD_TODO_SUCCEED as typeof ADD_TODO_SUCCEED
   }),
 
-  addTodoFail: (error: firestore.FirestoreError) => ({
+  addTodoFail: (error: Error) => ({
     type: ADD_TODO_FAIL as typeof ADD_TODO_FAIL,
     payload: { error },
     error: true
