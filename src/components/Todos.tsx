@@ -3,13 +3,10 @@ import Helmet from "react-helmet";
 import {
   Header,
   List,
-  Card,
   Checkbox,
   Loader,
   Form,
-  Button,
-  Segment,
-  Icon
+  Button
 } from "semantic-ui-react";
 import { TodoEntity, TodoStatus } from "../models/todo";
 
