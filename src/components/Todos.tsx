@@ -6,7 +6,8 @@ import {
   Checkbox,
   Loader,
   Form,
-  Button
+  Button,
+  Message
 } from "semantic-ui-react";
 import { TodoEntity, TodoStatus } from "../models/todo";
 
@@ -18,7 +19,7 @@ export interface TodosProps {
   inputText: string;
   isLoading: boolean;
   isAddingTodo: boolean;
-  error?: Error;
+  errorMessage?: string;
   onCheckboxClicked?: (todo: TodoEntity) => void;
   onInputTextChanged?: (text: string) => void;
   onFormSubmitted?: () => void;
@@ -31,7 +32,7 @@ const TodosComponent: React.FC<TodosProps> = ({
   inputText = "",
   isLoading = false,
   isAddingTodo = false,
-  error = undefined,
+  errorMessage = undefined,
   onCheckboxClicked = () => {},
   onInputTextChanged = () => {},
   onFormSubmitted = () => {},
@@ -77,6 +78,12 @@ const TodosComponent: React.FC<TodosProps> = ({
           <Loader active>Loading</Loader>
         ) : (
           <>
+            {errorMessage && (
+              <Message negative>
+                <Message.Header>Error</Message.Header>
+                <p>{errorMessage}</p>
+              </Message>
+            )}
             <Form onSubmit={onFormSubmitted} loading={isAddingTodo}>
               <Form.Input
                 placeholder="Add a to-do..."

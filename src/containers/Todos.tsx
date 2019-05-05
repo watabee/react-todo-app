@@ -36,6 +36,16 @@ interface DispatchProps {
 
 type EnhancedTodosProps = TodosProps & StateProps & DispatchProps;
 
+const getErrorMessage = (error?: Error) => {
+  if (error === undefined) {
+    return undefined;
+  } else if (error.message !== undefined) {
+    return error.message;
+  } else {
+    return "Error occurred";
+  }
+};
+
 const TodosContainer: React.FC<EnhancedTodosProps> = ({
   todoTodos,
   doneTodos,
@@ -76,7 +86,7 @@ const TodosContainer: React.FC<EnhancedTodosProps> = ({
       inputText={inputText}
       isLoading={isLoading}
       isAddingTodo={isAddingTodo}
-      error={error}
+      errorMessage={getErrorMessage(error)}
       onCheckboxClicked={(todo: TodoEntity) => {
         const newStatus: TodoStatus =
           todo.status === TodoStatus.Todo ? TodoStatus.Done : TodoStatus.Todo;
