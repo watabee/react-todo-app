@@ -139,6 +139,12 @@ class Firebase {
         onUpdate(todoTodos, doneTodos);
       }, onError);
   };
+
+  observeAuthStateChanged = (
+    onChanged: (user: firebase.User | null) => void
+  ) => {
+    return firebase.auth().onAuthStateChanged(onChanged);
+  };
 }
 
 export default Firebase;
