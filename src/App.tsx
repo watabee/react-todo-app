@@ -3,6 +3,7 @@ import { Switch, Route, Redirect } from "react-router";
 import Firebase, { FirebaseContext } from "./firebase";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import Home from "./containers/Home";
 import Todos from "./containers/Todos";
 import SignUp from "./containers/SignUp";
 import Login from "./containers/Login";
@@ -30,7 +31,8 @@ const App: React.FC<DispatchProps> = ({ authStateChanged }) => {
       <Switch>
         <ProtectedRoute path="/todos" exact component={Todos} />
         <Route path="/signup" component={SignUp} />
-        <Route path="/" exact component={Login} />
+        <Route path="/login" exact component={Login} />
+        <Route path="/" exact component={Home} />
         <Redirect to="/" />
       </Switch>
     </>

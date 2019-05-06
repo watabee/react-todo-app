@@ -1,7 +1,7 @@
 import * as firebase from "firebase/app";
 import { Reducer } from "redux";
 
-const AUTH_STATE_CHANGED = "todoApp/user/AUTH_STATE_CHANGED";
+export const AUTH_STATE_CHANGED = "todoApp/user/AUTH_STATE_CHANGED";
 
 interface AuthStateChangedParams {
   user: firebase.User | null;
