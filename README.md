@@ -1,3 +1,16 @@
+# react-todo-app
+
+This is my first react project 🎉
+
+- React
+- Redux
+- Redux Saga
+- Firebase
+  - Authentication
+  - Could Firestore
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
