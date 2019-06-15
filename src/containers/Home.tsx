@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 
 import { homeActions } from "../redux/modules/home";
-import { RouteComponentProps } from "react-router";
 import { AppState } from "../redux/state";
 import { Dispatch, bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import useReactRouter from "use-react-router";
 
 interface StateProps {
   redirectToLogin: boolean;
@@ -16,15 +16,16 @@ interface DispatchProps {
   resetState: () => void;
 }
 
-type EnhancedProps = StateProps & DispatchProps & RouteComponentProps;
+type EnhancedProps = StateProps & DispatchProps;
 
 const HomeContainer: React.FC<EnhancedProps> = ({
   redirectToLogin,
   redirectToTodos,
   waiting,
-  resetState,
-  history
+  resetState
 }) => {
+  const { history } = useReactRouter();
+
   useEffect(() => {
     if (redirectToLogin) {
       history.replace("/login");

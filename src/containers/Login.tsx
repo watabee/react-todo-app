@@ -6,8 +6,8 @@ import { AppState } from "../redux/state";
 import { Dispatch, bindActionCreators } from "redux";
 import { loginActions } from "../redux/modules/login";
 import { connect } from "react-redux";
-import { RouteComponentProps } from "react-router";
 import { History } from "history";
+import useReactRouter from "use-react-router";
 
 interface StateProps {
   isLoading: boolean;
@@ -25,21 +25,18 @@ interface DispatchProps {
   resetError: () => void;
 }
 
-type EnhancedSignUpProps = LoginProps &
-  StateProps &
-  DispatchProps &
-  RouteComponentProps;
+type EnhancedSignUpProps = LoginProps & StateProps & DispatchProps;
 
 const LoginContainer: React.FC<EnhancedSignUpProps> = ({
   isLoading,
   error,
   loginStart,
-  resetError,
-  history
+  resetError
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const firebase = useContext(FirebaseContext) as Firebase;
+  const { history } = useReactRouter();
 
   const canLogin = email.length > 0 && password.length > 0;
 
