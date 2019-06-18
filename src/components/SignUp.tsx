@@ -11,7 +11,7 @@ import {
 
 import "./SignUp.css";
 
-export interface SignUpProps {
+interface SignUpProps {
   isLoading: boolean;
   canSignUp: boolean;
   error?: string;
