@@ -13,7 +13,7 @@ import { TodoEntity, TodoStatus } from "../models/todo";
 
 import "./Todos.css";
 
-export interface TodosProps {
+interface TodosProps {
   todoTodos: TodoEntity[];
   doneTodos: TodoEntity[];
   inputText: string;

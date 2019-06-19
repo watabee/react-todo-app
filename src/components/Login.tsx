@@ -10,7 +10,7 @@ import {
 } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 
-export interface LoginProps {
+interface LoginProps {
   isLoading: boolean;
   canLogin: boolean;
   error?: string;
