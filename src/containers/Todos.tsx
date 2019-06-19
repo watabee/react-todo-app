@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useCallback } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import Firebase, { FirebaseContext } from "../firebase";
 
 import TodosComponent from "../components/Todos";
@@ -19,16 +19,13 @@ const getErrorMessage = (error?: Error) => {
 
 const TodosContainer: React.FC = () => {
   const firebase = useContext(FirebaseContext) as Firebase;
-  const {
-    isLoading,
-    isAddingTodo,
-    todoTodos,
-    doneTodos,
-    inputText,
-    error
-  } = useSelector<AppState, TodosState>(state => state.todos);
+  const { isLoading, isAddingTodo, todoTodos, doneTodos, error } = useSelector<
+    AppState,
+    TodosState
+  >(state => state.todos);
 
   const dispatch = useDispatch();
+  const [inputText, setInputText] = useState("");
 
   useEffect(() => {
     dispatch(todosActions.updateTodosStart());
@@ -44,6 +41,7 @@ const TodosContainer: React.FC = () => {
   const onFormSubmitted = useCallback(() => {
     if (inputText.trim().length > 0) {
       dispatch(todosActions.addTodoStart({ firebase, title: inputText }));
+      setInputText("");
     }
   }, [dispatch, inputText, firebase]);
 
@@ -56,11 +54,6 @@ const TodosContainer: React.FC = () => {
       );
     },
     [dispatch, firebase]
-  );
-
-  const onInputTextChanged = useCallback(
-    (text: string) => dispatch(todosActions.updateInputText({ text })),
-    [dispatch]
   );
 
   const onDeleteButtonClicked = useCallback(
@@ -78,7 +71,7 @@ const TodosContainer: React.FC = () => {
       isAddingTodo={isAddingTodo}
       errorMessage={getErrorMessage(error)}
       onCheckboxClicked={onCheckboxClicked}
-      onInputTextChanged={onInputTextChanged}
+      onInputTextChanged={setInputText}
       onFormSubmitted={onFormSubmitted}
       onDeleteButtonClicked={onDeleteButtonClicked}
     />

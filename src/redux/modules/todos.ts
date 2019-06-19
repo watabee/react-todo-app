@@ -15,7 +15,6 @@ const ADD_TODO_FAIL = "todoApp/todos/ADD_TODO_FAIL";
 const UPDATE_TODO_TO_DELETE_START = "todoApp/todos/DELETE_TODO_START";
 const UPDATE_TODO_TO_DELETE_SUCCEED = "todoApp/todos/DELETE_TODO_SUCCEED";
 const UPDATE_TODO_TO_DELETE_FAIL = "todoApp/todos/DELETE_TODO_FAIL";
-const UPDATE_INPUT_TEXT = "todoApp/todos/UPDATE_INPUT_TEXT";
 
 interface UpdateTodosResult {
   todoTodos: TodoEntity[];
@@ -36,10 +35,6 @@ interface AddTodoParams {
 interface UpdateTodoToDeleteParams {
   firebase: Firebase;
   todo: TodoEntity;
-}
-
-interface UpdateInputTextParams {
-  text: string;
 }
 
 export const todosActions = {
@@ -99,11 +94,6 @@ export const todosActions = {
     type: UPDATE_TODO_TO_DELETE_FAIL as typeof UPDATE_TODO_TO_DELETE_FAIL,
     payload: { error },
     error: true
-  }),
-
-  updateInputText: (params: UpdateInputTextParams) => ({
-    type: UPDATE_INPUT_TEXT as typeof UPDATE_INPUT_TEXT,
-    payload: { params }
   })
 };
 
@@ -119,15 +109,13 @@ type TodosAction =
   | ReturnType<typeof todosActions.addTodoFail>
   | ReturnType<typeof todosActions.updateTodoToDeleteStart>
   | ReturnType<typeof todosActions.updateTodoToDeleteSucceed>
-  | ReturnType<typeof todosActions.updateTodoToDeleteFail>
-  | ReturnType<typeof todosActions.updateInputText>;
+  | ReturnType<typeof todosActions.updateTodoToDeleteFail>;
 
 export interface TodosState {
   isLoading: boolean;
   isAddingTodo: boolean;
   todoTodos: TodoEntity[];
   doneTodos: TodoEntity[];
-  inputText: string;
   error?: Error;
 }
 
@@ -135,8 +123,7 @@ const initialState: TodosState = {
   isLoading: true,
   isAddingTodo: false,
   todoTodos: [],
-  doneTodos: [],
-  inputText: ""
+  doneTodos: []
 };
 
 export const reducer: Reducer<TodosState, TodosAction> = (
@@ -148,8 +135,7 @@ export const reducer: Reducer<TodosState, TodosAction> = (
       return {
         ...state,
         isLoading: true,
-        error: undefined,
-        inputText: ""
+        error: undefined
       };
 
     case UPDATE_TODOS_SUCCEED:
@@ -194,8 +180,7 @@ export const reducer: Reducer<TodosState, TodosAction> = (
     case ADD_TODO_SUCCEED:
       return {
         ...state,
-        isAddingTodo: false,
-        inputText: ""
+        isAddingTodo: false
       };
 
     case ADD_TODO_FAIL:
@@ -220,12 +205,6 @@ export const reducer: Reducer<TodosState, TodosAction> = (
       return {
         ...state,
         error: action.payload.error
-      };
-
-    case UPDATE_INPUT_TEXT:
-      return {
-        ...state,
-        inputText: action.payload.params.text
       };
 
     default:
