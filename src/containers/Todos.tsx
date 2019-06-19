@@ -1,40 +1,11 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useCallback } from "react";
 import Firebase, { FirebaseContext } from "../firebase";
 
-import TodosComponent, { TodosProps } from "../components/Todos";
-import { todosActions } from "../redux/modules/todos";
-import { Dispatch, bindActionCreators } from "redux";
-import { connect } from "react-redux";
+import TodosComponent from "../components/Todos";
+import { todosActions, TodosState } from "../redux/modules/todos";
+import { useSelector, useDispatch } from "react-redux";
 import { TodoEntity, TodoStatus } from "../models/todo";
 import { AppState } from "../redux/state";
-
-interface StateProps {
-  todoTodos: TodoEntity[];
-  doneTodos: TodoEntity[];
-  isLoading: boolean;
-  isAddingTodo: boolean;
-  inputText: string;
-  error?: Error;
-}
-
-interface DispatchProps {
-  addTodo: (firebase: Firebase, title: string) => void;
-  updateTodosStart: () => void;
-  updateTodosSucceed: (
-    todoTodos: TodoEntity[],
-    doneTodos: TodoEntity[]
-  ) => void;
-  updateTodosFail: (error: Error) => void;
-  updateTodoStatus: (
-    firebase: Firebase,
-    todo: TodoEntity,
-    newStatus: TodoStatus
-  ) => void;
-  updateTodoToDelete: (firebase: Firebase, todo: TodoEntity) => void;
-  updateInputText: (text: string) => void;
-}
-
-type EnhancedTodosProps = TodosProps & StateProps & DispatchProps;
 
 const getErrorMessage = (error?: Error) => {
   if (error === undefined) {
@@ -46,38 +17,57 @@ const getErrorMessage = (error?: Error) => {
   }
 };
 
-const TodosContainer: React.FC<EnhancedTodosProps> = ({
-  todoTodos,
-  doneTodos,
-  inputText,
-  isLoading,
-  isAddingTodo,
-  error,
-  updateTodoStatus,
-  updateTodoToDelete,
-  addTodo,
-  updateTodosStart,
-  updateTodosSucceed,
-  updateTodosFail,
-  updateInputText
-}) => {
+const TodosContainer: React.FC = () => {
   const firebase = useContext(FirebaseContext) as Firebase;
+  const {
+    isLoading,
+    isAddingTodo,
+    todoTodos,
+    doneTodos,
+    inputText,
+    error
+  } = useSelector<AppState, TodosState>(state => state.todos);
 
-  const onFormSubmitted = () => {
-    if (inputText.trim().length > 0) {
-      addTodo(firebase, inputText);
-    }
-  };
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    updateTodosStart();
+    dispatch(todosActions.updateTodosStart());
     const unsubscribe = firebase.observeTodos(
-      updateTodosSucceed,
-      updateTodosFail
+      (todoTodos, doneTodos) =>
+        dispatch(todosActions.updateTodosSucceed({ todoTodos, doneTodos })),
+      error => dispatch(todosActions.updateTodosFail(error))
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [dispatch]);
+
+  const onFormSubmitted = useCallback(() => {
+    if (inputText.trim().length > 0) {
+      dispatch(todosActions.addTodoStart({ firebase, title: inputText }));
+    }
+  }, [dispatch, inputText, firebase]);
+
+  const onCheckboxClicked = useCallback(
+    (todo: TodoEntity) => {
+      const newStatus: TodoStatus =
+        todo.status === TodoStatus.Todo ? TodoStatus.Done : TodoStatus.Todo;
+      dispatch(
+        todosActions.updateTodoStatusStart({ firebase, todo, newStatus })
+      );
+    },
+    [dispatch, firebase]
+  );
+
+  const onInputTextChanged = useCallback(
+    (text: string) => dispatch(todosActions.updateInputText({ text })),
+    [dispatch]
+  );
+
+  const onDeleteButtonClicked = useCallback(
+    (todo: TodoEntity) =>
+      dispatch(todosActions.updateTodoToDeleteStart({ firebase, todo })),
+    [dispatch, firebase]
+  );
 
   return (
     <TodosComponent
@@ -87,55 +77,12 @@ const TodosContainer: React.FC<EnhancedTodosProps> = ({
       isLoading={isLoading}
       isAddingTodo={isAddingTodo}
       errorMessage={getErrorMessage(error)}
-      onCheckboxClicked={(todo: TodoEntity) => {
-        const newStatus: TodoStatus =
-          todo.status === TodoStatus.Todo ? TodoStatus.Done : TodoStatus.Todo;
-        updateTodoStatus(firebase, todo, newStatus);
-      }}
-      onInputTextChanged={updateInputText}
+      onCheckboxClicked={onCheckboxClicked}
+      onInputTextChanged={onInputTextChanged}
       onFormSubmitted={onFormSubmitted}
-      onDeleteButtonClicked={todo => updateTodoToDelete(firebase, todo)}
+      onDeleteButtonClicked={onDeleteButtonClicked}
     />
   );
 };
 
-const mapStateToProps = (state: AppState): StateProps => ({
-  todoTodos: state.todos.todoTodos,
-  doneTodos: state.todos.doneTodos,
-  inputText: state.todos.inputText,
-  isLoading: state.todos.isLoading,
-  isAddingTodo: state.todos.isAddingTodo,
-  error: state.todos.error
-});
-
-const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
-  bindActionCreators(
-    {
-      addTodo: (firebase: Firebase, title: string) =>
-        todosActions.addTodoStart({ firebase, title }),
-
-      updateTodosStart: () => todosActions.updateTodosStart(),
-
-      updateTodosSucceed: (todoTodos: TodoEntity[], doneTodos: TodoEntity[]) =>
-        todosActions.updateTodosSucceed({ todoTodos, doneTodos }),
-
-      updateTodosFail: (error: Error) => todosActions.updateTodosFail(error),
-
-      updateTodoStatus: (
-        firebase: Firebase,
-        todo: TodoEntity,
-        newStatus: TodoStatus
-      ) => todosActions.updateTodoStatusStart({ firebase, todo, newStatus }),
-
-      updateTodoToDelete: (firebase: Firebase, todo: TodoEntity) =>
-        todosActions.updateTodoToDeleteStart({ firebase, todo }),
-
-      updateInputText: (text: string) => todosActions.updateInputText({ text })
-    },
-    dispatch
-  );
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(TodosContainer);
+export default TodosContainer;
