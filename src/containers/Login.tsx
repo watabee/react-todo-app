@@ -1,42 +1,22 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import Firebase, { FirebaseContext } from "../firebase";
 
-import Login, { LoginProps } from "../components/Login";
+import Login from "../components/Login";
 import { AppState } from "../redux/state";
-import { Dispatch, bindActionCreators } from "redux";
-import { loginActions } from "../redux/modules/login";
-import { connect } from "react-redux";
-import { History } from "history";
+import { loginActions, LoginState } from "../redux/modules/login";
+import { useSelector, useDispatch } from "react-redux";
 import useReactRouter from "use-react-router";
 
-interface StateProps {
-  isLoading: boolean;
-  error?: string;
-}
-
-interface DispatchProps {
-  loginStart: (
-    history: History,
-    firebase: Firebase,
-    email: string,
-    password: string
-  ) => void;
-
-  resetError: () => void;
-}
-
-type EnhancedSignUpProps = LoginProps & StateProps & DispatchProps;
-
-const LoginContainer: React.FC<EnhancedSignUpProps> = ({
-  isLoading,
-  error,
-  loginStart,
-  resetError
-}) => {
+const LoginContainer: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const firebase = useContext(FirebaseContext) as Firebase;
   const { history } = useReactRouter();
+
+  const { isLoading, error } = useSelector<AppState, LoginState>(
+    state => state.login
+  );
+  const dispatch = useDispatch();
 
   const canLogin = email.length > 0 && password.length > 0;
 
@@ -44,19 +24,23 @@ const LoginContainer: React.FC<EnhancedSignUpProps> = ({
   const onPasswordTextChanged = (e: any) =>
     setPassword(e.nativeEvent.target.value);
 
-  const onButtonClicked = () => {
-    loginStart(history, firebase, email, password);
-  };
+  const onButtonClicked = useCallback(
+    () =>
+      dispatch(loginActions.loginStart({ history, firebase, email, password })),
+    [dispatch, history, firebase, email, password]
+  );
 
   useEffect(() => {
-    return () => resetError();
+    return () => {
+      dispatch(loginActions.resetError());
+    };
   }, []);
 
   return (
     <Login
       isLoading={isLoading}
       canLogin={canLogin}
-      error={error}
+      error={error ? error.message : undefined}
       onEmailTextChanged={onEmailTextChanged}
       onPasswordTextChanged={onPasswordTextChanged}
       onButtonClicked={onButtonClicked}
@@ -64,27 +48,4 @@ const LoginContainer: React.FC<EnhancedSignUpProps> = ({
   );
 };
 
-const mapStateToProps = (state: AppState): StateProps => ({
-  isLoading: state.login.isLoading,
-  error: state.login.error ? state.login.error.message : undefined
-});
-
-const mapDispatchToProps = (dispatch: Dispatch): DispatchProps =>
-  bindActionCreators(
-    {
-      loginStart: (
-        history: History,
-        firebase: Firebase,
-        email: string,
-        password: string
-      ) => loginActions.loginStart({ history, firebase, email, password }),
-
-      resetError: () => loginActions.resetError()
-    },
-    dispatch
-  );
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(LoginContainer);
+export default LoginContainer;
